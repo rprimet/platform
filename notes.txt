@@ -1,0 +1,68 @@
+# Minimal OCaml platform: notes
+
+## LLM log
+
+> /ask look into the windows github workflow and any other file you need and tel
+> l me how I could make an absolutely minimal bundle and windows installer. Do n
+> ot give me any changes yet other than config changes and I want the cmdline in
+> vocations to do in a windows box, I do not need to do that in Github CI (yet) 
+
+Voici la recette pour, sur une simple machine Windows, obtenir un bundle et un  
+installeur absolument minimal, sans toucher au code, juste en jouant sur les    
+options de configuration et en lançant deux commandes :                         
+
+ 1 Dans une invite Windows (cmd.exe), placez-vous dans le répertoire racine du  
+   dépôt (contenant coq_platform_make_windows.bat) et exécutez :                
+                                                                                
+   coq_platform_make_windows.bat ^                                              
+     -destcyg=C:\cygwin_coq_min ^                                               
+     -arch=64           ^  rem 64 bits                                          
+     -extent=b          ^  rem build *seulement* Coq (pas CoqIDE)               
+     -parallel=s        ^  rem builds séquentiels                               
+     -jobs=1            ^  rem 1 thread de compilation                          
+     -compcert=n        ^  rem pas de CompCert                                  
+     -vst=n             ^  rem pas de VST                                       
+     -unimath=n         ^  rem pas d’UniMath                                    
+     -large=n           ^  rem pas de “gros” paquets                            
+     -set-switch=y      ^  rem activer automatiquement le switch opam           
+     -build=y           ^  rem installer Cygwin *et* compiler                   
+                                                                                
+   → Cela installe un Cygwin réduit dans C:\cygwin_coq_min et crée un switch    
+   opam ne contenant que Coq (et son ocamlfind minimal).                        
+ 2 Une fois ce build terminé, générez l’installeur NSIS en lançant dans la même 
+   invite Windows :                                                             
+                                                                                
+   C:\cygwin_coq_min\bin\bash --login -c "cd /platform &&                       
+   windows/create_installer_windows.sh"                                         
+                                                                                
+   → Le script va repiquer uniquement les fichiers strictement nécessaires      
+   (binaires Coq, bibliothèques de base) et produire, dans windows_installer/,  
+   un exécutable NSIS minimal.                                                  
+
+Et voilà : votre installateur ne contiendra que coqc, ses bibliothèques, et rien
+d’autre. Si vous voulez aussi CoqIDE, remplacez -extent=b par -extent=i.        
+
+## Trials
+
+-> NOTE: I tried launching the command without parallelism and jobs options, just leaving the defaults for those
+
+### Error
+
+The setup has detected that long paths in not enabled in the registry.
+If you want to enable it automatically now, select Y - otherwise C.
+========================= WINDOWS LONG PATH SUPPORT =========================
+Enable long path support in registry (y) (y/c=cancel) y
+
+Long path support enabled in registry ==========
+ERROR: Illegal value n for -large/COQ_PLATFORM_LARGE. Valid is '[ies]'.
+ERROR coq_platform_make_windows.bat failed
+
+## Trial 2
+
+-> `large=e` (exclude) -- values are include/exclude/select... ? (select is interactive ?)
+
+Note: we need to do some interactive selection (version of coq, sequential/parallel build, number of make jobs).
+
+Choosing latest coq, sequential build, 4 make jobs
+
+
