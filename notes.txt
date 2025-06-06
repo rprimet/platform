@@ -32,8 +32,7 @@ options de configuration et en lançant deux commandes :
  2 Une fois ce build terminé, générez l’installeur NSIS en lançant dans la même 
    invite Windows :                                                             
                                                                                 
-   C:\cygwin_coq_min\bin\bash --login -c "cd /platform &&                       
-   windows/create_installer_windows.sh"                                         
+   C:\cygwin_coq_min\bin\bash --login -c "cd /platform && windows/create_installer_windows.sh"                                         
                                                                                 
    → Le script va repiquer uniquement les fichiers strictement nécessaires      
    (binaires Coq, bibliothèques de base) et produire, dans windows_installer/,  
@@ -65,4 +64,9 @@ Note: we need to do some interactive selection (version of coq, sequential/paral
 
 Choosing latest coq, sequential build, 4 make jobs
 
+-> Build script finishes, no apparent error -> now on to the installer creation?
+-> Run cmd proposed by o4 -> "cp: impossible d'évaluer 'source/coqide/ide/coqide/coq.ico': No such file or directory"
+   -> it might be a bug in the installer creation script: I selected the base package without coqide, the installer creator
+      should not attempt to copy it?
+      
 
